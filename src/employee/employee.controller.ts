@@ -10,23 +10,31 @@ import {Response} from 'express'
 export class EmployeeController {
 	constructor(private empService: EmployeeService) {}
 
-	@Get()
-	getAllEmp(
-		@Res() res: Response
-	){
-		res.status(200).send({message: "All users"})
-		return this.empService.getAllEmp()
-	}
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
 	createNewEmp(
 		@Body() dto: CreateEmpDto,
 		@Res() res: Response
-	){
+	){	
+		const newEmp = this.empService.createEmp(dto)
 		res.status(201).send({
-			message: `user ${dto.email} created`,
+			message: newEmp,
 			status: 201
 		})
-		return this.empService.createEmp(dto)
+		return newEmp
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Get()
+	async getAllEmp(
+		@Res() res: Response
+	) {
+		console.log('get all emp');
+		
+		const allEmp = await this.empService.getAllEmp();
+		console.log(allEmp);
+		
+		res.status(200).send(allEmp);
+		return allEmp
 	}
 }

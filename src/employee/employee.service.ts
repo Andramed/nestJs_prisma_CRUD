@@ -1,18 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEmpDto } from './dto';
+import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
 export class EmployeeService {
-
-	getAllEmp() {
-		console.log('get all emp called');
-		return { message: "Data obtained"}
+	constructor (private prisma: PrismaService){}
+	async getAllEmp() {
+		const allEmp = await this.prisma.employee.findMany(); 
+		return allEmp
 	}
 
-	createEmp(data: CreateEmpDto) {
-		console.log(data);
-		return { message: "Data obtained"}
+	async createEmp(data: CreateEmpDto) {
+		console.log('este chemat serviciu de a crea nou emp');
 		
+		const newEmp = await this.prisma.employee.create(
+			{
+				data: {
+					...data
+				}
+			}
+		)
+		return newEmp.email
 	}
 
 }
