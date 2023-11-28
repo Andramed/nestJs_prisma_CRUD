@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmpDto } from './dto';
 
@@ -29,12 +29,22 @@ export class EmployeeController {
 	async getAllEmp(
 		@Res() res: Response
 	) {
-		console.log('get all emp');
-		
+
 		const allEmp = await this.empService.getAllEmp();
-		console.log(allEmp);
-		
 		res.status(200).send(allEmp);
 		return allEmp
+	}
+
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@Delete(':id') 
+	async deleteEmp(
+		@Param('id', ParseIntPipe) id: number,
+		@Res() res: Response
+	) {
+		console.log('try to delete user with id:', id);
+		
+		const deletedEmp = await this.empService.deleteEmp(id);
+		res.status(204).send();
+		return deletedEmp;
 	}
 }

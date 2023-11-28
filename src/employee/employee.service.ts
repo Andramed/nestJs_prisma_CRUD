@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateEmpDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service'
 
@@ -11,7 +11,7 @@ export class EmployeeService {
 	}
 
 	async createEmp(data: CreateEmpDto) {
-		console.log('este chemat serviciu de a crea nou emp');
+		
 		
 		const newEmp = await this.prisma.employee.create(
 			{
@@ -21,6 +21,28 @@ export class EmployeeService {
 			}
 		)
 		return newEmp.email
+	}
+
+	async deleteEmp(id: number) {
+		const user = await this.prisma.employee.findUnique({
+			where : {
+				id: id
+			}
+		})
+		if (!user) {
+			throw new ForbiddenException(`Employe with id: ${id} dont exist`)
+		}
+		const deletedUser = await this.prisma.employee.delete({
+			where: {
+				id: id
+			}
+		})
+	
+		if (deletedUser && deletedUser.email) {
+			return deletedUser.email;
+		} else {
+			throw new Error('Failed to delete user or retrieve email');
+		}
 	}
 
 }
