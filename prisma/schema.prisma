@@ -14,8 +14,8 @@ model Employee {
 	id Int @id @default(autoincrement())
 	createdAt DateTime @default(now())
 
-	email String @unique
-	name String
+	email String @unique 
+	firstName String
 	lastName String
 
 }
