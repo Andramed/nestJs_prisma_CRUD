@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateEmpDto } from './dto';
+import { CreateEmpDto, EditEmp } from './dto';
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
@@ -43,6 +43,28 @@ export class EmployeeService {
 		} else {
 			throw new Error('Failed to delete user or retrieve email');
 		}
+	}
+
+	async editEmp (id: number, dto: EditEmp) {
+		console.log(id, dto);
+		const user = await this.prisma.employee.findUnique({
+			where: {
+				id: id
+			}
+		})
+		if (!user) {
+			throw new ForbiddenException('user not with this id not founded for editing')
+		}
+
+		const editedUser = await this.prisma.employee.update({
+			where: {
+				id: id, 
+			},
+			data: dto
+		})
+		console.log(editedUser);
+		
+		return editedUser
 	}
 
 }

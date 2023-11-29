@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmpDto } from './dto';
+import { CreateEmpDto, EditEmp } from './dto';
 
 import {Response} from 'express'
 
@@ -46,5 +46,18 @@ export class EmployeeController {
 		const deletedEmp = await this.empService.deleteEmp(id);
 		res.status(204).send();
 		return deletedEmp;
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Patch(':id')
+	async editEmp (
+		@Param('id', ParseIntPipe) id: number,
+		@Res() res: Response,
+		@Body() data: EditEmp
+
+	) {
+		const editedUser = await this.empService.editEmp(id, data);
+		res.status(200).send(editedUser);
+		return editedUser
 	}
 }
