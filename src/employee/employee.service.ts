@@ -46,7 +46,6 @@ export class EmployeeService {
 	}
 
 	async editEmp (id: number, dto: EditEmp) {
-		console.log(id, dto);
 		const user = await this.prisma.employee.findUnique({
 			where: {
 				id: id
@@ -55,15 +54,12 @@ export class EmployeeService {
 		if (!user) {
 			throw new ForbiddenException('user not with this id not founded for editing')
 		}
-
 		const editedUser = await this.prisma.employee.update({
 			where: {
 				id: id, 
 			},
 			data: dto
 		})
-		console.log(editedUser);
-		
 		return editedUser
 	}
 
