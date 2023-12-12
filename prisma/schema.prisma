@@ -18,4 +18,31 @@ model Employee {
 	firstName String
 	lastName String
 
+	
+
+	managerId Int
+	manager Manager @relation(fields: [managerId], references: [id])
 }
+
+model Manager {
+	id Int @id @default(autoincrement())
+	createdAt DateTime @default(now())
+	role String
+
+	email String @unique
+	hash String
+
+	firstName String?
+	lastName String?
+
+	
+
+	employees Employee[]
+}
+
+
+
+
+
+
+
