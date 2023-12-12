@@ -5,23 +5,44 @@ import { PrismaService } from '../prisma/prisma.service'
 @Injectable()
 export class EmployeeService {
 	constructor (private prisma: PrismaService){}
-	async getAllEmp() {
-		const allEmp = await this.prisma.employee.findMany(); 
-		return allEmp
+	async getAllEmpByManagerId(managerId: number) {
+		console.log('search manager');
+		
+		const manager = await this.prisma.manager.findUnique({
+			where: {
+				id: managerId
+			}
+		})
+		if (!manager) {
+			return {message: "this manager don't exist"}
+		}
+		const allEmpBymanagerId = await this.prisma.employee.findMany({
+			where: {
+				managerId: managerId
+			}
+		})
+		return allEmpBymanagerId
 	}
 
 	async createEmp(data: CreateEmpDto) {
+		console.log('chemam serviciu', Number.isInteger(data.managerId));
 		
-		
-		const newEmp = await this.prisma.employee.create(
-			{
+		if (Number.isInteger(data.managerId)) {
+			const newEmp = await this.prisma.employee.create({
 				data: {
-					...data
+					firstName: data.firstName,
+					lastName: data.lastName,
+					email: data.email,
+					managerId: data.managerId
+
 				}
-			}
-		)
-		return newEmp.email
+			});
+			return newEmp.email;
+		}
 	}
+	
+	  
+	  
 
 	async deleteEmp(id: number) {
 		const user = await this.prisma.employee.findUnique({

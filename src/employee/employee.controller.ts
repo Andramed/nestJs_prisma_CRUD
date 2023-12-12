@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmpDto, EditEmp } from './dto';
 
@@ -16,6 +16,8 @@ export class EmployeeController {
 		@Body() dto: CreateEmpDto,
 		@Res() res: Response
 	){	
+		console.log(dto);
+		
 		const newEmp = this.empService.createEmp(dto)
 		res.status(201).send({
 			message: newEmp,
@@ -27,10 +29,12 @@ export class EmployeeController {
 	@HttpCode(HttpStatus.OK)
 	@Get()
 	async getAllEmp(
-		@Res() res: Response
+		@Res() res: Response,
+		@Query('managerId', ParseIntPipe) managerId: number
 	) {
-
-		const allEmp = await this.empService.getAllEmp();
+		console.log(typeof managerId, managerId);
+		
+		const allEmp = await this.empService.getAllEmpByManagerId(managerId);
 		res.status(200).send(allEmp);
 		return allEmp
 	}
