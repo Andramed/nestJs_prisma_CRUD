@@ -15,12 +15,8 @@ export class SignupService {
 	) {}
 
 	async signUp(credential: {email:string, password:string}) {
-
-	
-		
 		console.log(this.config.get('SALT_ROUNDS'));
 		const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
-
 		if (isNaN(rounds)) {
 		// Handle the case where the provided value is not a valid number
 		console.error('Invalid SALT_ROUNDS value. Please provide a valid number.');
@@ -28,7 +24,6 @@ export class SignupService {
 			const salt = await bcrypt.genSalt(rounds);
 			this.hash = await bcrypt.hash(credential.password, salt);
 		}
-		
 		const newManager = await this.prisma.manager.create({
 			data: {
 				email: credential.email,
@@ -39,7 +34,34 @@ export class SignupService {
 		delete newManager.hash
 		 const token = await this.signUpToken(newManager.id, newManager.email, newManager.role);
 		 return token
+	}
 
+	async creteAdminUser(credential:{email:string, password:string}) {
+		const adminUser = await this.prisma.manager.findUnique({
+			where: {email: credential.email}
+		})
+		const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
+			if (isNaN(rounds)) {
+				console.error('Invalid SALT_ROUNDS value. Please provide a valid number.');
+			} else {
+				const salt = await bcrypt.genSalt(rounds);
+				this.hash = await bcrypt.hash(credential.password, salt);
+			}
+		if (!adminUser) {
+			console.log('admin user will be created');
+			
+			const admin = await this.prisma.manager.create({
+				data: {
+					email: credential.email,
+					hash: this.hash,
+					role: "admin"
+				}
+			})
+
+			if (admin) {
+				console.log("Admin user created");
+			}
+		}
 	}
 
 	async signIn(dtoSignIn: {email:string, password:string}){
