@@ -5,23 +5,32 @@ import { PrismaService } from '../prisma/prisma.service'
 @Injectable()
 export class EmployeeService {
 	constructor (private prisma: PrismaService){}
-	async getAllEmpByManagerId(managerId: number) {
+	async getAllEmpByManagerId(managerId: number, managerRole: string) {
 		console.log('search manager');
 		
 		const manager = await this.prisma.manager.findUnique({
 			where: {
-				id: managerId
+				id: managerId,
 			}
 		})
 		if (!manager) {
 			return {message: "this manager don't exist"}
 		}
-		const allEmpBymanagerId = await this.prisma.employee.findMany({
-			where: {
-				managerId: managerId
-			}
-		})
-		return allEmpBymanagerId
+		switch (managerRole) {
+			case 'admin':
+					const allEmp = await this.prisma.employee.findMany();
+					return allEmp
+				break;
+			case 'manager':
+				const allEmpBymanagerId = await this.prisma.employee.findMany({
+					where: {
+						managerId: managerId
+					}
+				})
+				return allEmpBymanagerId
+			default:
+				break;
+		}
 	}
 
 	async createEmp(data: CreateEmpDto) {

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { SignInDto, SignUpDto } from '../dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import {ManagerModel} from '../../interface/ManagerModel.interface'
 
 @Injectable()
-export class SignupService {
+export class AddManagerService {
 	hash!:string
 	constructor (
 		private prisma: PrismaService, 
@@ -14,8 +15,15 @@ export class SignupService {
 		private jwt: JwtService
 	) {}
 
-	async signUp(credential: {email:string, password:string}) {
+	async addManager(credential: {
+		email: string,
+		password: string,
+		firstName: string,
+		lastName: string,
+	}) {
 		console.log(this.config.get('SALT_ROUNDS'));
+		console.log(credential);
+		
 		const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
 		if (isNaN(rounds)) {
 		// Handle the case where the provided value is not a valid number
@@ -28,12 +36,14 @@ export class SignupService {
 			data: {
 				email: credential.email,
 				hash: this.hash,
-				role: 'manager'
+				role: 'manager',
+				firstName: credential.firstName,
+				lastName: credential.lastName
 			}
 		})
-		delete newManager.hash
-		 const token = await this.signUpToken(newManager.id, newManager.email, newManager.role);
-		 return token
+		
+	
+		 return newManager
 	}
 
 	async creteAdminUser(credential:{email:string, password:string}) {

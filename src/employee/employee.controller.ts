@@ -30,11 +30,16 @@ export class EmployeeController {
 	@Get()
 	async getAllEmp(
 		@Res() res: Response,
-		@Query('managerId', ParseIntPipe) managerId: number
+		@Query('managerId', ParseIntPipe) managerId: number,
+		@Query('managerRole') managerRole: string
+
 	) {
-		console.log(typeof managerId, managerId);
+		console.log({
+			managerId: managerId,
+			managerRole: managerRole
+		});
 		
-		const allEmp = await this.empService.getAllEmpByManagerId(managerId);
+		const allEmp = await this.empService.getAllEmpByManagerId(managerId, managerRole);
 		res.status(200).send(allEmp);
 		return allEmp
 	}

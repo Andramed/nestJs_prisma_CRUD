@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { SignInDto } from './dto';
 import { AuthService } from './auth.service';
-import { SignupService } from './signup/signup.service';
+import { AddManagerService} from './add-manager/add-manager.service';
 
 
 @Controller('signin')
@@ -13,7 +13,7 @@ export class AuthController {
 	}
 	constructor(
 		
-		private auth: SignupService
+		private auth: AddManagerService
 
 		) {}
 

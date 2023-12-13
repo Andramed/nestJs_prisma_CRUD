@@ -6,8 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 
-import { SignupController } from './auth/signup/signup.controller';
-import { SignupService } from './auth/signup/signup.service';
+import { AddManagerController } from './auth/add-manager/add-manager.controller';
+import { AddManagerService } from './auth/add-manager/add-manager.service';
 import { JwtService } from '@nestjs/jwt';
 
 
@@ -22,13 +22,13 @@ import { JwtService } from '@nestjs/jwt';
   providers: [
 		EmployeeService, 
 		AuthService, 
-		SignupService,
+		AddManagerService,
 		JwtService
 	],
   controllers: [
 		EmployeeController, 
 		AuthController, 
-		SignupController
+		AddManagerController
 	],
 
 })
