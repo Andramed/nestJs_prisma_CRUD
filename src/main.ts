@@ -13,6 +13,8 @@ async function bootstrap() {
 		password: config.get("ADMIN_PASSWORD")
 	}
   )
+
+  app.enableCors()
   await app.listen(3000);
 }
 bootstrap();
