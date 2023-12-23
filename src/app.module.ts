@@ -4,11 +4,12 @@ import { EmployeeController } from './employee/employee.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+
 
 import { AddManagerController } from './auth/add-manager/add-manager.controller';
 import { AddManagerService } from './auth/add-manager/add-manager.service';
 import { JwtService } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 
 
 
@@ -18,10 +19,11 @@ import { JwtService } from '@nestjs/jwt';
 		ConfigModule.forRoot({
 			isGlobal: true
 		}),
+		AuthModule,
 	],
   providers: [
 		EmployeeService, 
-		AuthService, 
+
 		AddManagerService,
 		JwtService
 	],

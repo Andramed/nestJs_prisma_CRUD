@@ -14,7 +14,6 @@ export class AddManagerService {
 		private config: ConfigService,
 		private jwt: JwtService
 	) {}
-
 	async addManager(credential: {
 		email: string,
 		password: string,
@@ -26,7 +25,6 @@ export class AddManagerService {
 		
 		const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
 		if (isNaN(rounds)) {
-		// Handle the case where the provided value is not a valid number
 		console.error('Invalid SALT_ROUNDS value. Please provide a valid number.');
 		} else {
 			const salt = await bcrypt.genSalt(rounds);
@@ -36,13 +34,11 @@ export class AddManagerService {
 			data: {
 				email: credential.email,
 				hash: this.hash,
-				role: 'manager',
 				firstName: credential.firstName,
-				lastName: credential.lastName
+				lastName: credential.lastName,
+				role: 2
 			}
 		})
-		
-	
 		 return newManager
 	}
 
@@ -64,10 +60,9 @@ export class AddManagerService {
 				data: {
 					email: credential.email,
 					hash: this.hash,
-					role: "admin"
+					role: 1
 				}
 			})
-
 			if (admin) {
 				console.log("Admin user created");
 			}
@@ -75,53 +70,44 @@ export class AddManagerService {
 	}
 
 	async signIn(dtoSignIn: {email:string, password:string}){
-		console.log(dtoSignIn);
-		
 		try {
-			const user = await this.prisma.manager.findUnique( 
-				{
-					where: {
-						email: dtoSignIn.email
+				const user = await this.prisma.manager.findUnique( 
+					{
+						where: {
+							email: dtoSignIn.email
+						}
+					}
+				) 
+				if (user) {
+					try {
+						console.log('try to compare password');
+						
+						const passMatche = await bcrypt.compare(dtoSignIn.password, user.hash);
+						console.log('password checker');
+						
+						if (passMatche) {
+							console.log('parolile coincid');
+							return this.signUpToken(user.id, user.role)
+						}
+					} catch (error) { 
+						console.log("passwor dosn't matche");
+						
 					}
 				}
-			) 
-			console.log(user);
-			
-			if (user) {
-				try {
-					console.log('try to compare password');
-					
-					const passMatche = await bcrypt.compare(dtoSignIn.password, user.hash);
-					console.log('password checker');
-					
-					if (passMatche) {
-						console.log('parolile coincid');
-						return this.signUpToken(user.id, user.email, user.role)
-					}
-				} catch (error) { 
-					console.log("passwor dosn't matche");
-					 
-				}
-			}
 		} catch (error) {
 			console.log('user with this email dont finded');
-			
 		}
-		
 	}
 
-	async signUpToken( userId: number , email:string, role:string) {
+	async signUpToken( UID: number , R:number) {
 		const payload = {
-			sub: userId,
-			email,
-			role
+			UID,
+			R
 		}
-
 		const token = await this.jwt.signAsync(payload, {
 			expiresIn: "60m",
 			secret: this.config.get('SECRET_JWT')
 		})
-
 		return {
 			accesToken: token
 		}

@@ -5,8 +5,12 @@ import { PrismaService } from '../prisma/prisma.service'
 @Injectable()
 export class EmployeeService {
 	constructor (private prisma: PrismaService){}
-	async getAllEmpByManagerId(managerId: number, managerRole: string) {
-		console.log('search manager');
+	async getAllEmpByManagerId(managerId: number, managerRole: number) {
+		
+		console.log({
+			managerId,
+			managerRole
+		});
 		
 		const manager = await this.prisma.manager.findUnique({
 			where: {
@@ -17,11 +21,11 @@ export class EmployeeService {
 			return {message: "this manager don't exist"}
 		}
 		switch (managerRole) {
-			case 'admin':
+			case 1:
 					const allEmp = await this.prisma.employee.findMany();
 					return allEmp
-				break;
-			case 'manager':
+				
+			case 2:
 				const allEmpBymanagerId = await this.prisma.employee.findMany({
 					where: {
 						managerId: managerId
@@ -34,9 +38,11 @@ export class EmployeeService {
 	}
 
 	async createEmp(data: CreateEmpDto) {
-		console.log('chemam serviciu', Number.isInteger(data.managerId));
+		console.log('chemam serviciu', data);
 		
 		if (Number.isInteger(data.managerId)) {
+			console.log('creat new emp');
+			
 			const newEmp = await this.prisma.employee.create({
 				data: {
 					firstName: data.firstName,
@@ -53,7 +59,7 @@ export class EmployeeService {
 	  
 	  
 
-	async deleteEmp(id: number) {
+	async deleteEmp(id: number, managerId:number, managerRole:number) {
 		const user = await this.prisma.employee.findUnique({
 			where : {
 				id: id
@@ -62,20 +68,21 @@ export class EmployeeService {
 		if (!user) {
 			throw new ForbiddenException(`Employe with id: ${id} dont exist`)
 		}
-		const deletedUser = await this.prisma.employee.delete({
-			where: {
-				id: id
-			}
-		})
-	
-		if (deletedUser && deletedUser.email) {
-			return deletedUser.email;
+		if (user.managerId === managerId || managerRole === 1) {
+			const deletedUser = await this.prisma.employee.delete({
+				where: {
+					id: id
+				}
+			})
+			return deletedUser
 		} else {
-			throw new Error('Failed to delete user or retrieve email');
+			throw new Error('Failed to delete manager not alloved to this');
 		}
+	
+		
 	}
 
-	async editEmp (id: number, dto: EditEmp) {
+	async editEmp (id: number, dto: EditEmp, managerId:number, managerRole:number) {
 		const user = await this.prisma.employee.findUnique({
 			where: {
 				id: id
@@ -84,13 +91,21 @@ export class EmployeeService {
 		if (!user) {
 			throw new ForbiddenException('user not with this id not founded for editing')
 		}
-		const editedUser = await this.prisma.employee.update({
-			where: {
-				id: id, 
-			},
-			data: dto
-		})
-		return editedUser
+		if (managerId === user.managerId  || managerRole === 1) {
+			console.log('au aceleasi iduri va fi schimbat');
+			
+			const editedUser = await this.prisma.employee.update({
+				where: {
+					id: id, 
+				},
+				data: dto
+			})
+			return editedUser
+		} else {
+			throw new Error("User no allowed to make changes");
+			
+		}
+
 	}
 
 }

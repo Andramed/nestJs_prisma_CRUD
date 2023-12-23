@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res, UseGuards, Request } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmpDto, EditEmp } from './dto';
 
 import {Response} from 'express'
+import { JwtGuard } from 'src/auth/guard';
 
 @Controller('employee')
 
@@ -10,63 +11,74 @@ import {Response} from 'express'
 export class EmployeeController {
 	constructor(private empService: EmployeeService) {}
 
-	@HttpCode(HttpStatus.CREATED)
-	@Post()
-	createNewEmp(
-		@Body() dto: CreateEmpDto,
-		@Res() res: Response
-	){	
-		console.log(dto);
-		
-		const newEmp = this.empService.createEmp(dto)
-		res.status(201).send({
-			message: newEmp,
-			status: 201
-		})
-		return newEmp
-	}
-
-	@HttpCode(HttpStatus.OK)
-	@Get()
-	async getAllEmp(
-		@Res() res: Response,
-		@Query('managerId', ParseIntPipe) managerId: number,
-		@Query('managerRole') managerRole: string
-
-	) {
-		console.log({
-			managerId: managerId,
-			managerRole: managerRole
-		});
-		
-		const allEmp = await this.empService.getAllEmpByManagerId(managerId, managerRole);
-		res.status(200).send(allEmp);
-		return allEmp
-	}
-
+	@UseGuards(JwtGuard)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@Delete(':id') 
+	@Delete(':id/delete') 
 	async deleteEmp(
+		@Request() req,
 		@Param('id', ParseIntPipe) id: number,
 		@Res() res: Response
 	) {
 		console.log('try to delete user with id:', id);
-		
-		const deletedEmp = await this.empService.deleteEmp(id);
+		const manager = req.user
+		const deletedEmp = await this.empService.deleteEmp(id, manager.id, manager.role);
 		res.status(204).send();
 		return deletedEmp;
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@Patch(':id')
+	@UseGuards(JwtGuard)
+	@Patch(':id/edit')
 	async editEmp (
 		@Param('id', ParseIntPipe) id: number,
 		@Res() res: Response,
-		@Body() data: EditEmp
+		@Body() data: EditEmp,
+		@Request() req,
 
 	) {
-		const editedUser = await this.empService.editEmp(id, data);
+		const manager = req.user
+		const editedUser = await this.empService.editEmp(id, data, manager.id, manager.role);
 		res.status(200).send(editedUser);
 		return editedUser
+	}
+
+
+	@HttpCode(HttpStatus.CREATED)
+	@UseGuards(JwtGuard)
+	@Post('create')
+	async addEmp(
+		@Request() req,
+		@Body() dto: CreateEmpDto,
+		@Res() res: Response
+	) {
+		console.log('a fost chemat crete post');
+		const creator = req.user
+		if(!creator) {
+			return {message: "dont find a valide creator to add a new emp"}
+		}
+		// console.log({...dto, id:creator.id});
+		const newEmp = await this.empService.createEmp({...dto, managerId:creator.id})
+		console.log(newEmp);
+		res.status(201).send({
+			message: newEmp,
+			status: 201
+		})
+		return newEmp
+		
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(JwtGuard)
+	@Get('allemp')
+	async getAllEmp(
+		@Res() res: Response,
+		@Request() req,
+	){	
+		console.log('try to obain all emp by role ');
+		
+		const manager = req.user
+		const allEmp = await this.empService.getAllEmpByManagerId(manager.id, manager.role);
+		res.status(200).send(allEmp);
+		return allEmp 
 	}
 }

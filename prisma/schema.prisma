@@ -27,8 +27,8 @@ model Employee {
 model Manager {
 	id Int @id @default(autoincrement())
 	createdAt DateTime @default(now())
-	role String
-
+	role Int 
+// Role admin = 1, manager = 2
 	email String @unique
 	hash String
 

@@ -4,5 +4,6 @@ export interface ManagerModel {
 		password: string,
 		firstName: string,
 		lastName: string,
+		role: number
 	}
 }
