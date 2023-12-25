@@ -18,7 +18,7 @@ async function bootstrap() {
 	{
 		email: config.get("ADMIN_LOGIN"),
 		password: config.get("ADMIN_PASSWORD")
-	}
+	} 
   )
 
   app.enableCors(

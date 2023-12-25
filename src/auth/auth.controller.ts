@@ -12,6 +12,7 @@ export class AuthController {
 	constructor(
 		private authService: AuthService
 		) {}
+	
 	@Get()
 	testGet(){
 		return {message: 'Test get'}
@@ -22,13 +23,9 @@ export class AuthController {
 	@Get('validate') 
 	validateToke(
 		@Headers() headers: any
-	){
-		console.log({
-			message: 'try to validate token at back end side',
-			headers
-		});
-		
-	}
+	){}
+
+	
 	@UseGuards(LocalAuthGuard) // obtaine accestoke
 	@Post() 
 	async login(@Request() req) {
@@ -45,6 +42,8 @@ export class AuthController {
 	getTest(
 		@Request() req
 	) {
+		console.log('test jwt');
+		
 		return req.user
 	}
 	

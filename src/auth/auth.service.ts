@@ -17,8 +17,6 @@ export class AuthService {
 		const promise = (
 			async () => {
 				try {
-					console.log('try to validate user');
-					
 					const user = await this.prisma.manager.findUnique({
 						where: {
 							email: email
@@ -50,8 +48,9 @@ export class AuthService {
 			role: user.role
 		}
 		return {
-			acces_token: this.jwtService.sign(payload)
+			tokenAcces: this.jwtService.sign(payload)
 		}
+		
 	}
 		
 }	
