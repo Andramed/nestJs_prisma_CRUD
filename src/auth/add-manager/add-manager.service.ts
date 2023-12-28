@@ -70,47 +70,4 @@ export class AddManagerService {
 		}
 	}
 
-	// async signIn(dtoSignIn: {email:string, password:string}){
-	// 	try {
-	// 			const user = await this.prisma.manager.findUnique( 
-	// 				{
-	// 					where: {
-	// 						email: dtoSignIn.email
-	// 					}
-	// 				}
-	// 			) 
-	// 			if (user) {
-	// 				try {
-	// 					console.log('try to compare password');
-						
-	// 					const passMatche = await bcrypt.compare(dtoSignIn.password, user.hash);
-	// 					console.log('password checker');
-						
-	// 					if (passMatche) {
-	// 						console.log('parolile coincid');
-	// 						return this.signUpToken(user.id, user.role)
-	// 					}
-	// 				} catch (error) { 
-	// 					console.log("passwor dosn't matche");
-						
-	// 				}
-	// 			}
-	// 	} catch (error) {
-	// 		console.log('user with this email dont finded');
-	// 	}
-	// }
-
-	// async signUpToken( UID: number , R:number) {
-	// 	const payload = {
-	// 		UID,
-	// 		R
-	// 	}
-	// 	const token = await this.jwt.signAsync(payload, {
-	// 		expiresIn: "60m",
-	// 		secret: this.config.get('SECRET_JWT')
-	// 	})
-	// 	return {
-	// 		accesToken: token
-	// 	}
-	// }
 }
