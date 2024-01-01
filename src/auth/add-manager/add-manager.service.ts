@@ -20,8 +20,7 @@ export class AddManagerService {
 		firstName: string,
 		lastName: string,
 	}) {
-		console.log(this.config.get('SALT_ROUNDS'));
-		console.log(credential);
+
 		
 		const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
 		if (isNaN(rounds)) {

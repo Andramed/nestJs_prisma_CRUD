@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res, UseGuards, Request } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmpDto, EditEmp } from './dto';
+
 
 import {Response} from 'express'
 import { JwtGuard } from 'src/auth/guard';
+import { CreateEmpDto, EditEmp } from '../employee/dto';
 
 @Controller('employee')
 
@@ -56,7 +57,16 @@ export class EmployeeController {
 		if(!creator) {
 			return {message: "dont find a valide creator to add a new emp"}
 		}
-		// console.log({...dto, id:creator.id});
+		console.log({
+			message: 'From create post'
+		});
+		console.log(
+			{
+				message: "Dto from controler",
+				...dto
+			}
+		);
+		
 		const newEmp = await this.empService.createEmp({...dto, managerId:creator.id})
 		console.log(newEmp);
 		res.status(201).send({
@@ -64,7 +74,6 @@ export class EmployeeController {
 			status: 201
 		})
 		return newEmp
-		
 	}
 
 	@HttpCode(HttpStatus.OK)

@@ -1,17 +1,17 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateEmpDto, EditEmp } from './dto';
 import { PrismaService } from '../prisma/prisma.service'
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
-	constructor (private prisma: PrismaService){}
+	hash!: string
+	constructor (
+		private prisma: PrismaService,
+		private config: ConfigService
+		){}
 	async getAllEmpByManagerId(managerId: number, managerRole: number) {
-		
-		console.log({
-			managerId,
-			managerRole
-		});
-		
 		const manager = await this.prisma.manager.findUnique({
 			where: {
 				id: managerId,
@@ -24,7 +24,6 @@ export class EmployeeService {
 			case 1:
 					const allEmp = await this.prisma.employee.findMany();
 					return allEmp
-				
 			case 2:
 				const allEmpBymanagerId = await this.prisma.employee.findMany({
 					where: {
@@ -43,13 +42,22 @@ export class EmployeeService {
 		if (Number.isInteger(data.managerId)) {
 			console.log('creat new emp');
 			
+
+			const rounds = parseInt(this.config.get('SALT_ROUNDS'), 10);
+			if (isNaN(rounds)) {
+			console.error('Invalid SALT_ROUNDS value. Please provide a valid number.');
+			} else {
+				const salt = await bcrypt.genSalt(rounds);
+				this.hash = await bcrypt.hash(data.password, salt);
+			}
+
 			const newEmp = await this.prisma.employee.create({
 				data: {
 					firstName: data.firstName,
 					lastName: data.lastName,
 					email: data.email,
-					managerId: data.managerId
-
+					managerId: data.managerId,
+					hash: this.hash
 				}
 			});
 			return newEmp.email;

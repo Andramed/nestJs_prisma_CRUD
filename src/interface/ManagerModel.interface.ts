@@ -2,9 +2,7 @@ import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator'
 
 
 export class ManagerModel {
-	
-	
-		
+
 		@IsEmail()
 		email: string;
 
@@ -19,6 +17,4 @@ export class ManagerModel {
 		
 		@IsNumber()
 		role: number
-
-	
 }
