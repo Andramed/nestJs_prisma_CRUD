@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Res, Headers, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Res, Headers, UseGuards, Request, Body } from '@nestjs/common';
 
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { AuthService } from './auth.service';
@@ -43,8 +43,9 @@ export class AuthController {
 		@Request() req
 	) {
 		console.log('test jwt');
-		
 		return req.user
 	}
+
+	
 	
 }

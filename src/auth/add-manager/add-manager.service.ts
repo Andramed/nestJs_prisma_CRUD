@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { SignInDto, SignUpDto } from '../dto';
+
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {ManagerModel} from '../../interface/ManagerModel.interface'
+
 
 @Injectable()
 export class AddManagerService {

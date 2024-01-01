@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, Request } from '@nestjs/common';
-import { SignUpDto } from '../dto';
+
 import { AddManagerService } from './add-manager.service';
 import { ManagerModel } from 'src/interface/ManagerModel.interface';
 import { JwtGuard } from '../guard';
@@ -23,8 +23,9 @@ export class AddManagerController {
 		if(!creator) {
 			return {message: "dont find a valide creator to add a new emp"}
 		}
-		const {data} = dto
-		const newManager = this.addManager.addManager(data);
+		console.log(dto);
+		
+		const newManager = this.addManager.addManager(dto);
 		return newManager	
 	} 
 
