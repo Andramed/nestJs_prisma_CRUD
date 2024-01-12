@@ -31,5 +31,4 @@ export class AddManagerController {
 
 }
 
-// > si cum implimentez ca de exemplu daca tokenul
-//  este in storage la user in browser, atunci sa se logheze cu ajutorul tokenului 
+

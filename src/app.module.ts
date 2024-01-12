@@ -10,6 +10,8 @@ import { AddManagerController } from './auth/add-manager/add-manager.controller'
 import { AddManagerService } from './auth/add-manager/add-manager.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
+import { ManagerController } from './manager/manager.controller';
+import { ManagerService } from './manager/manager.service';
 
 
 
@@ -25,12 +27,13 @@ import { AuthModule } from './auth/auth.module';
 		EmployeeService, 
 
 		AddManagerService,
-		JwtService
+		JwtService,
+		ManagerService
 	],
   controllers: [
 		EmployeeController, 
 		AuthController, 
-		AddManagerController
+		AddManagerController, ManagerController
 	],
 
 })
