@@ -26,4 +26,4 @@ RUN npx prisma generate
 RUN npm run build
 
 # Specify the command to run your application only after PostgreSQL is ready
-CMD [ "sh", "-c", "/usr/wait-for-it.sh my_postgres:5432 -- npx prisma db push && npm run start:dev" ]
+CMD [ "sh", "-c", "/usr/wait-for-it.sh my_postgres:5432 -- npx prisma db push --force-reset && npm run start:dev" ]
