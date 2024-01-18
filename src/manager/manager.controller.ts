@@ -1,9 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, Request, Get } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, Request, Get, Patch, Param, ParseIntPipe, Delete, Req } from '@nestjs/common';
 
 
 import { ManagerModel } from 'src/interface/ManagerModel.interface';
 import { JwtGuard } from 'src/auth/guard';
 import { ManagerService } from './manager.service';
+import { ManagerModelEdit } from 'src/interface/ManagerModeEdit.interface';
 
 @Controller('manager')
 export class ManagerController {
@@ -56,6 +57,60 @@ export class ManagerController {
 			return allManager
 		}
 		
+	}
+
+	@HttpCode(HttpStatus.CREATED)
+	@UseGuards(JwtGuard)
+	@Patch(':id/edit')
+	editManager(
+		@Body() editDto: ManagerModelEdit,
+		@Param('id', ParseIntPipe) id: number,
+
+		@Request() req,
+	){
+		console.log("edit manager contrler");
+		console.log(editDto);
+		
+		const manager = req.user
+		if (!manager) {
+			return{
+				message: "Don't find manager"
+			}
+		}
+
+		if (manager.role !== 1) {
+			throw new Error("This manager can not do this operation");
+		} else {
+			const editedManager = this.manager.editManager(editDto, id);
+			return editedManager 
+		}
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(JwtGuard)
+	@Delete(":id/delete")
+	async deleteManager(
+		@Param("id", ParseIntPipe) id: number,
+		@Request() req
+	) {
+		console.log("delete");
+		
+		const manager = req.user
+		if (!manager) {
+			return {
+				message: "Don't finf manager"
+			}
+		}
+
+		if(manager.role !== 1 ) {
+			throw new Error("This manager can not do this operation");
+			
+		} else {
+			const deletedManager = await this.manager.deleteManager(id);
+			console.log(deletedManager);
+			
+			return deletedManager
+		}
 	}
  
 

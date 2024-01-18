@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ManagerModelEdit } from 'src/interface/ManagerModeEdit.interface';
 
 
 @Injectable()
@@ -72,5 +73,73 @@ export class ManagerService {
 		const allManager = await this.prisma.manager.findMany();
 		return allManager
 	}
+
+	async editManager(editDTO: ManagerModelEdit, idManager: number) {
+		console.log({
+			location: "edit manager service",
+			editDTO
+		});
+		
+		const manager = await this.prisma.manager.findUnique({
+			where: {
+				id: idManager
+			}
+		})
+	
+		if (!manager) {
+			throw new Error(`Manager with id : ${idManager} not found`);
+		}
+	
+		try {
+			const editedUser = await this.prisma.manager.update({
+				where: {id: idManager},
+				data: editDTO
+			})
+			return editedUser;
+		} catch (error) {
+			console.log(error);
+			
+			throw new Error("Manager could not be updated");
+		}
+	}
+
+	async deleteManager(id: number) {
+		const manager = await this.prisma.manager.findUnique({
+			where: {
+				id: id
+			}
+		})
+
+		if (!manager) {
+			return {
+				message: `Mnaager with ${id} don't finded` 
+			}
+		}
+
+		try {
+			const deleteEmpOfManager = await this.prisma.employee.deleteMany({
+				where: {
+					managerId: manager.id
+				}
+			})
+			if (deleteEmpOfManager) {
+				const deletedUser = await this.prisma.manager.delete({
+					where: {
+						id: id
+					}
+				})
+				return deletedUser
+			}
+
+		
+		} catch (error) {
+			console.log({
+				error,
+				"message": "user cannot be deleted"
+			});
+			
+		}
+	}
+	
 
 }
