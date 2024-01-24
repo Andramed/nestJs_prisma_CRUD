@@ -16,31 +16,40 @@ export class AuthService {
 	validateUser(email: string, hash: string): Observable<any> {
 		const promise = (
 			async () => {
+				let user: { hash: any; id?: number; createdAt?: Date; email?: string; firstName?: string; lastName?: string; managerId?: number; role?: number; };
 				try {
-					const user = await this.prisma.manager.findUnique({
-						where: {
+					user = await this.prisma.employee.findUnique({
+						where:{
 							email: email
 						}
-					})
-					if (user) {
-						try {
-							const passMatche = await bcrypt.compare(hash, user.hash)
-							if (passMatche) {
-								delete user.hash
-								return user								
+					});
+					if (!user) {
+						user = await this.prisma.manager.findUnique({
+							where:{
+								email: email
 							}
-						} catch (error) {
-							throw new Error("password don't match, please try again");	
-						}
+						});
 					}
 				} catch (error) {
-					throw new Error("User with tihsi email don't finded");
+					throw new Error("User with this email don't finded")
+				}
+
+				if (user) {
+					try {
+						const passwordMatche = await bcrypt.compare(hash, user.hash);
+						if (passwordMatche) {
+							delete user.hash
+							return user
+						}
+					} catch (error) {
+						throw new Error("password dosn't match")
+					}
 				}
 			}
 		)();
 		return from(promise) 
 	}
-
+	
 	async login(user: any) {
 		console.log({
 			location: "auth service login",

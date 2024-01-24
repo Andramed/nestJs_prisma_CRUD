@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Res, Headers, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Get, Post, Res, Headers, UseGuards, Request, Body, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { AuthService } from './auth.service';
@@ -13,10 +13,7 @@ export class AuthController {
 		private authService: AuthService
 		) {}
 	
-	@Get()
-	testGet(){
-		return {message: 'Test get'}
-	}
+
 
 
 	@UseGuards(JwtGuard) // excute the user try to sign in
@@ -29,22 +26,19 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard) // obtaine accestoke
 	@Post() 
 	async login(@Request() req) {
-		console.log('query POST login');
-		const token = this.authService.login(req.user)
-		console.log({
-			cretedToken: await token
-		});
-		return await token
+		try {
+			const token = await this.authService.login(req.user);
+			return token
+		} catch (error) {
+			if (error instanceof UnauthorizedException) {
+				throw new HttpException("Invalid email or password", HttpStatus.UNAUTHORIZED);
+			} else {
+				throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
-
-	@UseGuards(JwtGuard) // test if token is present return user
-	@Get('testjwt')
-	getTest(
-		@Request() req
-	) {
-		console.log('test jwt');
-		return req.user
-	}
+	
+	
 
 	
 	

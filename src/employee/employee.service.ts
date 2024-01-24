@@ -106,7 +106,12 @@ export class EmployeeService {
 				where: {
 					id: id, 
 				},
-				data: dto
+				data: {
+					firstName: dto.firstName,
+					lastName: dto.lastName,
+					email: dto.email,
+					...(dto.hash !== '' && {hash: dto.hash})
+				}
 			})
 			return editedUser
 		} else {

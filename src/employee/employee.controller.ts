@@ -37,8 +37,11 @@ export class EmployeeController {
 		@Request() req,
 
 	) {
+		
+		console.log(data);
+		
 		const manager = req.user
-		const editedUser = await this.empService.editEmp(id, data, manager.id, manager.role);
+		const editedUser = await this.empService.editEmp(id, data, manager.id, manager.role );
 		res.status(200).send(editedUser);
 		return editedUser
 	}
