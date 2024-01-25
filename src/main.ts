@@ -4,6 +4,7 @@ import { AddManagerService } from './auth/add-manager/add-manager.service';
 import { ConfigService } from '@nestjs/config';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ValidationPipe } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
 
 const corsOption: CorsOptions = {
 	
@@ -25,6 +26,11 @@ async function bootstrap() {
 	app.enableCors(
 		corsOption
 	)
+	app.use((req: Request, res: Response, next: NextFunction) => {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+		next();
+	})
 
 	app.useGlobalPipes(new ValidationPipe())
 
